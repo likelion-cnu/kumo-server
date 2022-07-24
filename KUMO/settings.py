@@ -37,6 +37,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    # local apps
+    'accounts',
+    'shop',
+    'customer',
+    
+    # third apps
+    'qrcode',
+    'rest_framework',
+    'markdown',
+    'django_pydenticon',
+    'debug_toolbar',
+    
+    
 ]
 
 MIDDLEWARE = [
