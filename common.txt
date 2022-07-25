@@ -1,0 +1,9 @@
+django~=3.0.0
+djangorestframework
+djangorestframework-simplejwt
+django-rest-auth
+django-allauth
+django-cors-headers
+django-pydenticon
+pillow
+qrcode
