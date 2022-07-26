@@ -68,19 +68,10 @@ class User(AbstractUser):
         super().save(*args,**kwargs)
 
 
-
-# class QRCode(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     image = models.ImageField(upload_to='qrcode', blank=True)
-
-    
-    
-        
 # 고객 유저
 class CustomerUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    shop_name = models.CharField(max_length=15, blank=True)
-    shop_phone_num = models.CharField(
+    phone_num = models.CharField(
         max_length=13,
         blank=False,
         validators=[RegexValidator(r"^010-?[1-9]\d{3}-?\d{4}$")],

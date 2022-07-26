@@ -45,6 +45,7 @@ class LoginView(APIView):
             return Response(status=401)
 
 
+# 로그아웃하고, 토큰 삭제
 class LogoutView(APIView):
     def get(self, request, format=None):
         # simply delete the token to force a login

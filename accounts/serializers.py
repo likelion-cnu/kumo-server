@@ -2,8 +2,6 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from django.contrib.auth import get_user_model
 
-# from accounts.models import QRCode
-
 User = get_user_model()
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -22,10 +20,3 @@ class SignupSerializer(serializers.ModelSerializer):
             "username", "password", "phone_num", "is_shop"
         ]
 
-
-# class QRSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = QRCode
-#         fields = [
-#             "user"
-#         ]
