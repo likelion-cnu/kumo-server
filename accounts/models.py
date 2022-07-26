@@ -46,6 +46,7 @@ import random
 
 # 통합 유저
 class User(AbstractUser):
+    username = models.CharField(primary_key=True, max_length=10, unique=True)
     phone_num = models.CharField(
         max_length=13,
         blank=False,
@@ -70,7 +71,7 @@ class User(AbstractUser):
 
 # 고객 유저
 class CustomerUser(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     phone_num = models.CharField(
         max_length=13,
         blank=False,
@@ -82,7 +83,7 @@ class CustomerUser(models.Model):
 
 # 업주 유저
 class ShopUser(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     shop_name = models.CharField(max_length=15, blank=False)
     shop_phone_num = models.CharField(
         max_length=13,
