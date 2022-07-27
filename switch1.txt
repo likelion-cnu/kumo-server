@@ -1,1 +1,1 @@
-switch1 test
+switch2 test
