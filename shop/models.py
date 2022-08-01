@@ -27,8 +27,8 @@ class Coupon(models.Model):
 
 class Payment(models.Model):
     payment_at = models.DateTimeField(auto_now_add=True)
-    buyer = models.ForeignKey(CustomerUser, on_delete=models.CASCADE)
-    seller = models.ForeignKey(ShopUser, on_delete=models.CASCADE)
+    writer = models.ForeignKey(CustomerUser, on_delete=models.CASCADE)
+    shopname = models.ForeignKey(ShopUser, on_delete=models.CASCADE)
 
 
 

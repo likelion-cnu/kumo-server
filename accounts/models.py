@@ -72,6 +72,9 @@ class User(AbstractUser):
 # 고객 유저
 class CustomerUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    nickname = models.CharField(max_length=10, blank=True)
+    points = models.IntegerField(default=0, blank=True)
+    level = models.IntegerField(default=0, blank=True)
     phone_num = models.CharField(
         max_length=13,
         blank=False,
@@ -79,6 +82,12 @@ class CustomerUser(models.Model):
     )
     bookmark_set = models.ManyToManyField('ShopUser', blank=True)
 
+    def save(self,*args,**kwargs):
+        self.points += 100
+        if self.points >= 2000:
+            self.level += 1
+            self.points -= 2000
+        super().save(*args,**kwargs)
 
 
 # 업주 유저
@@ -90,6 +99,7 @@ class ShopUser(models.Model):
         blank=False,
         validators=[RegexValidator(r"^010-?[1-9]\d{3}-?\d{4}$")],
     )
+    is_Premium = models.BooleanField(default=False)
     shop_location = models.CharField(blank=False, max_length=100)
     shop_introduction = models.TextField(blank=False)
     shop_sector = models.CharField(blank=False, max_length=10)
