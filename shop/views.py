@@ -5,7 +5,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.decorators import action
@@ -14,8 +14,9 @@ from sympy import true
 from accounts.permissons import IsShop
 from accounts.models import User, CustomerUser, ShopUser
 
-from .serializers import ShopUserSerializer, QRcodeSerializer, PaymentSerializer, ReviewSerializer, ShopProfileUserSerializer
-from .models import Coupon, Payment, Review
+from .serializers import ShopUserSerializer, QRcodeSerializer, PaymentSerializer, ReviewSerializer, ReviewCommentSerializer ,ShopProfileUserSerializer, CouponeSerializer
+from .models import Coupon, Payment, Review, Review_Comment
+
 
 # 루트 페이지에 로그인 되어있는지와 업주 유저인지 확인
 class RootView(APIView):
@@ -91,6 +92,14 @@ class MyShopViewSet(viewsets.ModelViewSet):
         return Response(serializer.data + rev_serializer.data)
 
 
+    @action(detail=False, methods=['POST']) 
+    def create_comment(self, request):
+        serializer = ReviewCommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+    
+
     def get_queryset(self):
         user = ShopUser.objects.filter(user=self.request.user)
         qs = super().get_queryset()
@@ -100,32 +109,47 @@ class MyShopViewSet(viewsets.ModelViewSet):
 
 
 
-
-# 내 가게 리뷰에 접근하고 업주 유저인지 확인
-class MyShopReviewViewSet(ModelViewSet):
-# 업주만 접근 가능하게 permissoin 설정
-    # permission_classes = [IsShop]
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
-
-    def get_queryset(self):
-        user = ShopUser.objects.filter(user=self.request.user)
-        qs = super().get_queryset()
-        # 장고의 in은 튜플, 리스트, 쿼리셋 등 반복 가능한 객체를 조회한다. SQL문에서의 WHERE IN과 같은 역할을 한다.
-        qs = qs.filter(shopname__in=user)
-        return qs
-
-
-
 # 내 가게 데이터에 접근하고 주 유저인지 확인
-class ShopdataView(APIView):
+class ShopdataView(ReadOnlyModelViewSet):
     # 업주만 접근 가능하게 permissoin 설정
-    permission_classes = [IsShop]
-    pass   
+    #permission_classes = [IsShop]
+    
+    queryset = Payment.objects.all()
+    serializer_class = ReviewSerializer
+    
+    def list(self, request, *args, **kwargs):
+        payment_queryset = Payment.objects.filter(shopname=self.request.user.username)
+        payment_serializer = PaymentSerializer(payment_queryset, many=True)
+        
+        coupone_queryset = Coupon.objects.filter(shopname=self.request.user.username)
+        coupone_serializer = CouponeSerializer(coupone_queryset, many=True)
+        return Response(payment_serializer.data + coupone_serializer.data)
+
+        
+       
+
+
+
 
 
 # 업주 QNA에 접근하고 업주 유저인지 확인
 class ShopQnaView(APIView):
     # 업주만 접근 가능하게 permissoin 설정
-    permission_classes = [IsShop]
-    pass   
+    # permission_classes = [IsShop]
+    pass
+
+
+
+# # 내 가게 리뷰에 접근하고 업주 유저인지 확인
+# class MyShopReviewViewSet(ModelViewSet):
+# # 업주만 접근 가능하게 permissoin 설정
+#     # permission_classes = [IsShop]
+#     queryset = Review.objects.all()
+#     serializer_class = ReviewSerializer
+
+#     def get_queryset(self):
+#         user = ShopUser.objects.filter(user=self.request.user)
+#         qs = super().get_queryset()
+#         # 장고의 in은 튜플, 리스트, 쿼리셋 등 반복 가능한 객체를 조회한다. SQL문에서의 WHERE IN과 같은 역할을 한다.
+#         qs = qs.filter(shopname__in=user)
+#         return qs

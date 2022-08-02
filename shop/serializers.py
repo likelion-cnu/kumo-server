@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 
-from .models import Coupon, Review, Payment
+from .models import Coupon, Review, Payment, Review_Comment
 from accounts.models import ShopUser, User, CustomerUser
 
 
@@ -11,6 +11,7 @@ class QRcodeSerializer(serializers.ModelSerializer):
         fields = [
             "writer", "shopname"
         ]
+
 
 # Shop User 데이터 입력받기
 class ShopUserSerializer(serializers.ModelSerializer):
@@ -38,9 +39,25 @@ class ReviewSerializer(serializers.ModelSerializer):
         ]
 
 
+class ReviewCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review_Comment
+        fields = [
+            "writer", "post", "message"
+        ]
+
+
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = [
             "writer", "shopname"
+        ]
+
+
+class CouponeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Coupon
+        fields = [
+            "writer", "shopname", "coupon_num", "stamp_num", "created_at"
         ]
