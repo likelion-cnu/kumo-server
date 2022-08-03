@@ -31,6 +31,18 @@ class ShopProfileUserSerializer(serializers.ModelSerializer):
         ]
 
 
+# Shop 프로필 수정하기
+class ShopProfileEditSerializer(serializers.ModelSerializer):
+    class Meta:
+            model = ShopUser
+            fields = [
+                "user", "shop_name", "shop_phone_num"
+            ]
+
+
+
+
+
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review

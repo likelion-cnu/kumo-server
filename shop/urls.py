@@ -44,6 +44,7 @@ urlpatterns = [
     # 업주 프로필
     path("profile/", shop_profile),
 
+    path("change_profile/<str:user>", views.ChangeProfileView.as_view(), name="change_profile"),
 
     # 업주 QnA
     path("qna/", views.ShopQnaView.as_view()),

@@ -73,7 +73,6 @@ INSTALLED_APPS = [
     #'allauth.account',
     #'rest_auth',
     #'rest_auth.registration',
-    'django_pydenticon',
     'django.contrib.sites',
 
 ]

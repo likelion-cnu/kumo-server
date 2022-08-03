@@ -7,14 +7,14 @@ from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.decorators import api_view
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.decorators import action
 from sympy import true
 
 from accounts.permissons import IsShop
 from accounts.models import User, CustomerUser, ShopUser
 
-from .serializers import ShopUserSerializer, QRcodeSerializer, PaymentSerializer, ReviewSerializer, ReviewCommentSerializer ,ShopProfileUserSerializer, CouponeSerializer
+from .serializers import ShopUserSerializer, QRcodeSerializer, PaymentSerializer, ReviewSerializer, ReviewCommentSerializer ,ShopProfileUserSerializer, ShopProfileEditSerializer, CouponeSerializer
 from .models import Coupon, Payment, Review, Review_Comment
 
 
@@ -65,7 +65,6 @@ class ProfileViewSet(viewsets.ViewSet):
         queryset = Payment.objects.filter(shopname=self.request.user.username)
         serializer = PaymentSerializer(queryset, many=True)
         
-
         queryset2 = ShopUser.objects.filter(user=self.request.user.username)
         serializer2 = ShopProfileUserSerializer(queryset2, many=True)
         
@@ -127,9 +126,19 @@ class ShopdataView(ReadOnlyModelViewSet):
 
         
        
+class ChangeProfileView(generics.UpdateAPIView):
+    queryset = ShopUser.objects.all()
+    serializer_class = ShopProfileEditSerializer
+
+    lookup_field = 'username'
 
 
-
+    def get_queryset(self):
+        user = ShopUser.objects.filter(user=self.request.user.username)
+        qs = super().get_queryset()
+        # 장고의 in은 튜플, 리스트, 쿼리셋 등 반복 가능한 객체를 조회한다. SQL문에서의 WHERE IN과 같은 역할을 한다.
+        qs = qs.filter(user__in=user)
+        return qs
 
 
 # 업주 QNA에 접근하고 업주 유저인지 확인
@@ -139,17 +148,3 @@ class ShopQnaView(APIView):
     pass
 
 
-
-# # 내 가게 리뷰에 접근하고 업주 유저인지 확인
-# class MyShopReviewViewSet(ModelViewSet):
-# # 업주만 접근 가능하게 permissoin 설정
-#     # permission_classes = [IsShop]
-#     queryset = Review.objects.all()
-#     serializer_class = ReviewSerializer
-
-#     def get_queryset(self):
-#         user = ShopUser.objects.filter(user=self.request.user)
-#         qs = super().get_queryset()
-#         # 장고의 in은 튜플, 리스트, 쿼리셋 등 반복 가능한 객체를 조회한다. SQL문에서의 WHERE IN과 같은 역할을 한다.
-#         qs = qs.filter(shopname__in=user)
-#         return qs

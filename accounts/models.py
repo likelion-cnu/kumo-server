@@ -1,3 +1,4 @@
+from email.policy import default
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import RegexValidator
@@ -8,45 +9,13 @@ from PIL import Image, ImageDraw
 from io import BytesIO
 from django.core.files import File
 import random
-# # Create your models here.
-# class UserManager(BaseUserManager):    
-   
-#     use_in_migrations = True    
-   
-#     def create_user(self, phone_num, is_shop, password):        
-       
-#        if not phone_num:            
-#            raise ValueError('must have user phone')
-#        if not password:            
-#            raise ValueError('must have user password')
-
-#        user = self.model(            
-#            phone_num = phone_num,
-#            is_shop = is_shop   
-#        )        
-#        user.set_password(password)        
-#        user.save(using=self._db)        
-#        return user
-
-#     def create_superuser(self, phone_num, is_shop, password):        
-   
-#        user = self.create_user(            
-#            phone_num = phone_num,
-#            is_shop = is_shop,                        
-#            password=password        
-#        )
-#        user.is_admin = True
-#        user.is_superuser = True
-#        user.save(using=self._db)
-#        return user 
-
-
-
 
 
 # 통합 유저
 class User(AbstractUser):
     username = models.CharField(primary_key=True, max_length=10, unique=True)
+    nickname = models.CharField(max_length=10, unique=True, null=True)
+    profile_img = models.ImageField(upload_to='profile_img', null=True)
     phone_num = models.CharField(
         max_length=13,
         blank=False,
@@ -84,9 +53,18 @@ class CustomerUser(models.Model):
 
     def save(self,*args,**kwargs):
         self.points += 100
-        if self.points >= 2000:
+        if self.level == 0:
+                self.points >= 2000
+                self.level += 1
+                self.points -= 2000
+        elif self.level == 1:
+                self.points >= 3000
+                self.level += 1
+                self.points -= 3000
+        else:
+            self.points >= 4000
             self.level += 1
-            self.points -= 2000
+            self.points -= 4000
         super().save(*args,**kwargs)
 
 
