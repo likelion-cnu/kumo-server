@@ -130,7 +130,7 @@ class ChangeProfileView(generics.UpdateAPIView):
     queryset = ShopUser.objects.all()
     serializer_class = ShopProfileEditSerializer
 
-    lookup_field = 'username'
+    lookup_field = 'user'
 
 
     def get_queryset(self):
