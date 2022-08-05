@@ -15,10 +15,7 @@ from .serializers import LoginSerializer, SignupSerializer, ChangePwdSerializer
 from .models import  User, CustomerUser
 from . import models
 
-import qrcode
 
-
-# Create your views here.
 
 # 회원가입하고, 토큰 발행
 class SignupView(generics.CreateAPIView):
@@ -45,6 +42,7 @@ class LogoutView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
+# 비밀번호 변경
 class ChangePwdView(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = ChangePwdSerializer
@@ -58,17 +56,4 @@ class ChangePwdView(generics.UpdateAPIView):
         # 장고의 in은 튜플, 리스트, 쿼리셋 등 반복 가능한 객체를 조회한다. SQL문에서의 WHERE IN과 같은 역할을 한다.
         qs = qs.filter(username__in=user)
         return qs
-
-
-# @csrf_exempt
-# def login(request):
-#     if request.method == 'POST':
-#         data = JSONParser().parse(request)
-#         search_username = data['username']
-#         obj = User.objects.get(username=search_username)
-
-#         if data['password'] == obj.password:
-#             return HttpResponse(status=200)
-#         else:
-#             return HttpResponse(status=400)
 

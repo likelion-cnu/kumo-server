@@ -27,7 +27,7 @@ class RootView(APIView):
 
 # QR 체크하고, 고객의 쿠폰의 스탬프 개수, 유저 레벨, 결제 정보를 올리는 뷰 // POST, UPDATE
 class Check_QRcodeViewSet(viewsets.ViewSet):
-    # permission_classes = [IsShop]
+    permission_classes = [IsShop]
 
     def create(self, request):
         serializer = QRcodeSerializer(data=request.data)
@@ -59,7 +59,7 @@ class Check_QRcodeViewSet(viewsets.ViewSet):
 # 업체 프로필에 접근하고 업주 유저인지 확인
 class ProfileViewSet(viewsets.ViewSet):
     # 업주만 접근 가능하게 permissoin 설정
-    # permission_classes = [IsShop]
+    permission_classes = [IsShop]
     
     def list(self, request): 
         queryset = Payment.objects.filter(shopname=self.request.user.username)
@@ -76,7 +76,7 @@ class ProfileViewSet(viewsets.ViewSet):
 # 내 가게에 접근하고 업주 유저인지 확인
 class MyShopViewSet(viewsets.ModelViewSet):
     # 업주만 접근 가능하게 permissoin 설정
-    # permission_classes = [IsShop]
+    permission_classes = [IsShop]
     queryset = ShopUser.objects.all()
     serializer_class = ShopUserSerializer
     
