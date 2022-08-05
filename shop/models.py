@@ -46,7 +46,6 @@ class Review(models.Model):
     review_photo = models.ImageField(blank=True)
     review_caption = models.TextField(max_length=100)
 
-
 class Review_Comment(BaseModel):
     writer = models.ForeignKey(ShopUser, on_delete=models.CASCADE)
     post = models.ForeignKey(Review, on_delete=models.CASCADE)
