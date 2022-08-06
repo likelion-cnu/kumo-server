@@ -1,11 +1,18 @@
-from turtle import stamp
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
 
+from .validators import validate_score
+
 from accounts.models import User, CustomerUser, ShopUser
 # Create your models here.
+
+class BaseModel(models.Model):
+
+    class Meta:
+        # 아래 코드를 통해 실제 DB에 적용되지 않고, 추상 클래스로 만들어진다.
+        abstract = True
 
 
 class Coupon(models.Model):
@@ -27,20 +34,27 @@ class Coupon(models.Model):
 
 class Payment(models.Model):
     payment_at = models.DateTimeField(auto_now_add=True)
-    buyer = models.ForeignKey(CustomerUser, on_delete=models.CASCADE)
-    seller = models.ForeignKey(ShopUser, on_delete=models.CASCADE)
+    writer = models.ForeignKey(CustomerUser, on_delete=models.CASCADE)
+    shopname = models.ForeignKey(ShopUser, on_delete=models.CASCADE)
 
 
 
 class Review(models.Model):
     writer = models.ForeignKey(CustomerUser, on_delete=models.CASCADE, related_name="review_writer")
     shopname = models.ForeignKey(ShopUser, on_delete=models.CASCADE, related_name="review_shopname")
-    review_star = models.IntegerField(default=3)
+    review_star = models.IntegerField(default=3, validators=[validate_score])
     review_photo = models.ImageField(blank=True)
     review_caption = models.TextField(max_length=100)
 
+class Review_Comment(BaseModel):
+    writer = models.ForeignKey(ShopUser, on_delete=models.CASCADE)
+    post = models.ForeignKey(Review, on_delete=models.CASCADE)
+    message = models.TextField(max_length=200)
 
-    
+    class Meta:
+        ordering = ['-id']
+
+
 class ShopQna(models.Model):
     title = models.CharField(max_length=20)
     content = models.TextField(max_length=200)
