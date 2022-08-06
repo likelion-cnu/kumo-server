@@ -15,8 +15,15 @@ customer_profile = views.MyProfileViewSet.as_view({
     'get' : 'list',
 })
 
+bookmark = views.BookmarkView.as_view({
+    'get' : 'list',
+})
+
+
+
 urlpatterns = [
     path('<int:pk>/', views.RootView.as_view()),
+    path('<int:pk>/', views.HomeView.as_view()),
     path('search/', views.SearchListView.as_view()),
     re_path(r'^purchases/(?P<user>.+)/$', views.SearchListView.as_view()),
     path('<int:pk>/profile/', customer_profile),
@@ -28,7 +35,7 @@ urlpatterns = [
 #    path('')
 #    path('neighborhood/', views.NeighborhoodView.as_view())
         
-####    path('<int:pk>/bookmark/', views.BookmarkView.as_view()),
+#    path('<int:pk>/bookmark/', bookmark),
 
     path('qna/', views.CustomerQnaView.as_view()),
 ]

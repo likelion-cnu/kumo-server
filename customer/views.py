@@ -42,8 +42,14 @@ class SearchListView(generics.ListAPIView):
         else: 
             return ShopUser.objects.none()
 
-    permission_classes = [IsCustomer]
-    pass
+
+#QR보여주는 홈을 띄우는 뷰
+class HomeView(APIView):
+    def get(self, request, format=None):
+        qrcode = request.user.auth_token.get()
+
+ 
+
 
 ################# 북마크한 리스트를 띄우는 뷰
 #class BookmarkView(generics.ListCreateAPIView):
@@ -52,11 +58,11 @@ class SearchListView(generics.ListAPIView):
 #        return queryset.filter(bookmarked_set=self.request.user)
 
 class BookmarkView(generics.ListCreateAPIView):
-    queryset = Coupon.objects.all()
+    queryset = CustomerUser.objects.filter('bookmark_set') #북마크셋을 불러오기
     serializer_class = MyStampSerializer
 
     def get_queryset(self):
-#        queryset = CustomerUser.objects.filter() #blank=True가 true일때
+        queryset = CustomerUser.objects.filter('bookmark_set'==True).all() #blank=True가 true일때
         super().get_queryset()
         return queryset
 
