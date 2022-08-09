@@ -12,7 +12,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from shop.models import Coupon, Review
 from accounts.models import ShopUser, User, CustomerUser
 
-from .serializers import MyStampSerializer, CouponHistorySerializer, UserProfileSerializer, ReviewCreatSerializer, UserProfileEditSerializer, SearchSerializer
+from .serializers import MyStampSerializer, CouponHistorySerializer, UserProfileSerializer, ReviewCreatSerializer, UserProfileEditSerializer, SearchSerializer, HomeSerializer
 from shop.serializers import ReviewSerializer, ShopProfileUserSerializer, ShopUserSerializer
 
 from accounts.permissons import IsCustomer
@@ -26,6 +26,7 @@ class RootView(APIView):
     pass   
         
 
+
 # 가게를 검색하는 뷰
 class SearchListView(generics.ListAPIView):
     queryset = ShopUser.objects.all()
@@ -33,24 +34,26 @@ class SearchListView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['shop_name']
 
-    def get_queryset(self):
+    def get_queryset(self, request):
         queryset = ShopUser.objects.all()
         user = self.request.query_params.get('user')   
-        if user.is_authenticated:
-            queryset = queryset.filter(search__user=user)
+        if request.user.is_authenticated:
+            queryset = queryset.objects.filter(search__user=user)
             return queryset
         else: 
             return ShopUser.objects.none()
 
 
 #QR보여주는 홈을 띄우는 뷰
-class HomeView(APIView):
-    def get(self, request, format=None):
-        qrcode = request.user.auth_token.get()
+class HomeView(viewsets.ViewSet):
+    def list(self, request, pk):
+        queryset = User.objects.filter(user=self.request.user.username)
+        serializer = HomeSerializer(queryset, many=True)
+
+        return Response(serializer.data)
+
 
  
-
-
 ################# 북마크한 리스트를 띄우는 뷰
 #class BookmarkView(generics.ListCreateAPIView):
 #    def get_queryset(self):
@@ -97,8 +100,6 @@ class ChangeProfileView(generics.UpdateAPIView):
 
 
 
-
-
 # 가게 세부정보랑 리뷰를 띄우는 뷰
 class ShopDetailViewSet(viewsets.ModelViewSet):
     queryset = ShopUser.objects.all()
@@ -130,6 +131,7 @@ class ShopDetailViewSet(viewsets.ModelViewSet):
         qs = qs.filter(user__in=user)
         return qs
 
+
 ################보류/ 근처 가게를 띄우는 뷰
 class NeighborhoodView(APIView):
     # 고객만 접근 가능하게 permissoin 설정
@@ -139,11 +141,13 @@ class NeighborhoodView(APIView):
 
 # 고객의 스탬프 갯수를 띄우는 뷰
 class StampViewSet(viewsets.ReadOnlyModelViewSet):
-    # 고객만 접근 가능하게 permissoin 설정
-    queryset = Coupon.objects.all()
-    serializer_class = MyStampSerializer
-    permission_classes = [IsCustomer]
-    pass
+    def get(self, request, *args, **kwargs):
+        queryset = Coupon.objects.filter(user=self.request.user)
+        serializer_class = MyStampSerializer
+
+        
+
+
 
 
 # 고객의 QNA를 띄우는 뷰
