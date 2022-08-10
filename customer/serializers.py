@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from shop.models import Coupon, Review, Review_Comment
-from accounts.models import ShopUser, CustomerUser
+from accounts.models import ShopUser, CustomerUser, User
 
 #MYPROFILE
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -74,4 +74,16 @@ class SearchSerializer(serializers.ModelSerializer):
         model = ShopUser
         fields = [
            "shop_name", "shop_phone_num", "shop_sector", 
+        ]
+    
+
+#HOEM
+class HomeSerializer(serializers.ModelSerializer):
+#    bookmark_home = models.ImageField(upload_to='', null=True)
+#    neighborhood_home = models.ImageField(upload_to='', null=True)
+    class Meta:
+        model = User
+        field = [ 
+            "image" 
+            #"bookmark_home", "neighborhood_home"
         ]
