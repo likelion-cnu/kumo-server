@@ -21,14 +21,21 @@ user_review = views.ShopDetailViewSet.as_view({
 
 
 
+shop_profile = views.BookmarkView.as_view({
+    'get' : 'list',
+})
+
 urlpatterns = [
-    path('<int:pk>/', views.RootView.as_view()),
     path('search/', views.SearchListView.as_view()),
     re_path(r'^purchases/(?P<user>.+)/$', views.SearchListView.as_view()),
     path('home/', views.HomeView.as_view(), name='view'),
     path('profile/', myprofile),
     path('change_profile/', views.ChangeProfileView.as_view(), name="change_profile"),
-    #path('bookmark/', views.BookmarkView.as_view()),
+    
+    path('bookmark_add/', views.Bookmark_add),
+    path('bookmark_remove/', views.Bookmark_remove),
+
+    path('bookmark/', shop_profile),
     #path('neighborhood/', views.NeighborhoodView.as_view()),
     path('shopdetail/', shopdetail),
     path('review/', user_review),

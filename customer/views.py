@@ -6,12 +6,13 @@ from rest_framework.decorators import api_view
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from shop.models import Coupon, Review
 from accounts.models import ShopUser, User, CustomerUser
 
-from .serializers import MyStampSerializer, CouponHistorySerializer, UserProfileSerializer, ReviewCreatSerializer, UserProfileEditSerializer, SearchSerializer, HomeSerializer
-from shop.serializers import ReviewSerializer, ShopProfileUserSerializer, ShopUserSerializer
+from .serializers import MyStampSerializer, CouponHistorySerializer, UserProfileSerializer, ReviewCreatSerializer, UserProfileEditSerializer, SearchSerializer, HomeSerializer, BookmarkSerializer
+from shop.serializers import ReviewSerializer, ShopProfileUserSerializer, ShopUserSerializer, CouponeSerializer
 
 from accounts.permissons import IsCustomer
 # Create your views here.
@@ -119,16 +120,43 @@ class ShopDetailViewSet(viewsets.ModelViewSet):
         qs = qs.filter(user__in=user)
         return qs
 
+# bookmark한 가게들 출력
+class BookmarkView(ReadOnlyModelViewSet):
+    queryset = CustomerUser.objects.all()
+    serializer_class = BookmarkSerializer
+    #permission_classes = [IsCustomer]
 
-#class BookmarkView(generics.ListCreateAPIView):
-#    queryset = CustomerUser.objects.filter('bookmark_set') #북마크셋을 불러오기
-#    serializer_class = MyStampSerializer
+    def list(self, request, *args, **kwargs):
+        queryset = CustomerUser.objects.filter(user=self.request.user.username)
+        serializer = BookmarkSerializer(queryset, many=True)
+        
+        coupon = Coupon.objects.filter(writer=self.request.user.username)
+        cu_serializer = CouponeSerializer(coupon, many=True)
+        
+        return Response(serializer.data + cu_serializer.data)
 
-#    def get_queryset(self):
-#        queryset = CustomerUser.objects.filter('bookmark_set'==True).all() #blank=True가 true일때
-#        super().get_queryset()
-#        return queryset
-#ValueError: too many values to unpack (expected 2)
+
+@api_view(['POST'])
+def Bookmark_add(request):
+    if request.method == 'POST':
+        bookmarked_user = ShopUser.objects.filter(user=request.user.username)
+        request.user.bookmark_set.add(bookmarked_user)
+        bookmarked_user.add(request.user)
+
+    return Response(status=201)
+
+@api_view(['POST'])
+def Bookmark_remove(request):
+    if request.method == 'POST':
+        bookmarked_user = ShopUser.objects.filter(user=request.user.username)
+        request.user.bookmark_set.remove(bookmarked_user)
+        bookmarked_user.remove(request.user)
+    return Response(status=201)
+
+
+
+
+
 
 # 고객의 QNA를 띄우는 뷰
 class CustomerQnaView(APIView):

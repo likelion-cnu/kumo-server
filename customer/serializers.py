@@ -34,7 +34,12 @@ class MyStampSerializer(serializers.ModelSerializer):
         ]
 
 #BOOKMARK
-
+class BookmarkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomerUser
+        fields = [
+           "bookmark_set"
+        ]
 
 #NEIGHBORHOOD
 
