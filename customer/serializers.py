@@ -83,7 +83,4 @@ class HomeSerializer(serializers.ModelSerializer):
 #    neighborhood_home = models.ImageField(upload_to='', null=True)
     class Meta:
         model = User
-        field = [ 
-            "image" 
-            #"bookmark_home", "neighborhood_home"
-        ]
+        fields = ["image"]

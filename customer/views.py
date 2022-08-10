@@ -1,4 +1,3 @@
-from csv import writer
 from django.shortcuts import get_object_or_404, render
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -25,11 +24,14 @@ class RootView(APIView):
     pass 
 
 class HomeView(APIView):
+
+    lookup_field = 'username'
+    
     def get(self, request):
-        pk = request.GET.get('pk')
-        queryset = User.objects.get(category = pk)
+        queryset = User.objects.filter(username = self.request.user.username)
         serializer = HomeSerializer(queryset, many=True)
         return Response(serializer.data)
+
 
 class SearchListView(generics.ListAPIView):
     queryset = ShopUser.objects.all()
@@ -60,6 +62,7 @@ class MyProfileViewSet(viewsets.ViewSet):
 
         return Response(serializer.data + serializer2.data)
 
+
 class ChangeProfileView(generics.UpdateAPIView):
     queryset = CustomerUser.objects.all()
     serializer_class = UserProfileEditSerializer
@@ -84,6 +87,7 @@ class StampView(generics.ListCreateAPIView):
         queryset = self.get_queryset()
         serializer = MyStampSerializer(queryset, many=True)
         return Response(serializer.data)
+
 
 class ShopDetailViewSet(viewsets.ModelViewSet):
     queryset = ShopUser.objects.all()
