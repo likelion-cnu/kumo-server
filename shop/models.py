@@ -47,8 +47,11 @@ class Review(models.Model):
     review_photo = models.ImageField(blank=True)
     review_caption = models.TextField(max_length=100)
 
+<<<<<<< HEAD
 
 # 리뷰 댓글 테이블
+=======
+>>>>>>> 1bb47f7f23db468e565ee23edbc543b75fe14113
 class Review_Comment(BaseModel):
     writer = models.ForeignKey(ShopUser, on_delete=models.CASCADE)
     post = models.ForeignKey(Review, on_delete=models.CASCADE)

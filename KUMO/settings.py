@@ -47,7 +47,7 @@ SECRET_KEY = get_secret("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -69,6 +69,14 @@ INSTALLED_APPS = [
     'qrcode',
     'rest_framework',
     'rest_framework.authtoken',
+<<<<<<< HEAD
+=======
+    'django_filters',
+    #'allauth',
+    #'allauth.account',
+    #'rest_auth',
+    #'rest_auth.registration',
+>>>>>>> 1bb47f7f23db468e565ee23edbc543b75fe14113
     'django.contrib.sites',
 
 ]
@@ -173,7 +181,11 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
         'rest_framework.authentication.TokenAuthentication',
+    
     ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+        ],
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
