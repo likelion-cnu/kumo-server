@@ -36,6 +36,9 @@ mystamp =  views.StampView.as_view({
     'get' : 'list',
 })
 
+bookmark = views.BookmarkView.as_view({
+    'get' : 'list',
+})
 
 urlpatterns = [
     path('search/', views.SearchListView.as_view()),
@@ -46,6 +49,7 @@ urlpatterns = [
     path('couponhistory/', couponhistory),
     path('bookmark_add/', views.Bookmark_add),
     path('bookmark_remove/', views.Bookmark_remove),
+    path('bookmark/', bookmark),
     path('review/', user_review),
     path('reviewer/', post_review),    
     #path('neighborhood/', views.NeighborhoodView.as_view()),
