@@ -53,14 +53,14 @@ class ShopbriefSerializer(serializers.ModelSerializer):
 
 ###SHOPDETAIL
 class ShopDetailSerializer(serializers.ModelSerializer):
-    coupon_num = serializers.CharField(source = Coupon.coupon_num)
-    stamp_num = serializers.CharField(source = Coupon.stamp_num)
+    #coupon_num = serializers.CharField(source = Coupon.coupon_num)
+    #stamp_num = serializers.CharField(source = Coupon.stamp_num)
     class Meta:
         model = ShopUser
         fields = [
-            "shop_name", "shop_phone_num", "shop_sector", "coupon_num", "stamp_num", "shop_introduction"
+            "shop_name", "shop_phone_num", "shop_sector",  "shop_introduction"
         ]
-        
+        #"coupon_num", "stamp_num",
 class ReviewCreatSerializer(serializers.ModelSerializer):
     message = serializers.CharField(source = Review_Comment.message)
     class Meta:
