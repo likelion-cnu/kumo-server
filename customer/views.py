@@ -172,7 +172,7 @@ class BookmarkView(ReadOnlyModelViewSet):
         coupon = Coupon.objects.filter(writer=self.request.user.username)
         cu_serializer = CouponeSerializer(coupon, many=True)
         
-        return Response(self,request, *args, **kwargs)
+        return super().list(serializer.data)
 
 
 @api_view(['POST'])
