@@ -4,7 +4,7 @@ from rest_framework import serializers
 from .models import Coupon, Review, Payment, Review_Comment
 from accounts.models import ShopUser, User, CustomerUser
 
-
+# QR코드 Serializer
 class QRcodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coupon
@@ -13,7 +13,7 @@ class QRcodeSerializer(serializers.ModelSerializer):
         ]
 
 
-# Shop User 데이터 입력받기
+# Shop User Serializer
 class ShopUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShopUser
@@ -31,7 +31,7 @@ class ShopProfileUserSerializer(serializers.ModelSerializer):
         ]
 
 
-# Shop 프로필 수정하기
+# Shop 프로필 Serializer
 class ShopProfileEditSerializer(serializers.ModelSerializer):
     class Meta:
             model = ShopUser

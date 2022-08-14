@@ -25,7 +25,7 @@ class User(AbstractUser):
     is_shop = models.BooleanField(blank=False, null=True)
     image = models.ImageField(upload_to='qrcode', null=True)
     
-    
+    # 유저가 회원가입 될 때 QR 코드 생성 구현
     def save(self,*args,**kwargs):
         qrcode_img=qrcode.make(self.username)
         canvas=Image.new("RGB", (300,300),"white")
@@ -51,6 +51,7 @@ class CustomerUser(models.Model):
     )
     bookmark_set = models.ManyToManyField('ShopUser', blank=True)
 
+    # QR 체크시 고객 유저를 저장함으로서 points 추가
     def save(self,*args,**kwargs):
         self.points += 100
         if self.level == 0:

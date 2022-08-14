@@ -9,6 +9,7 @@ from django.contrib.auth.password_validation import validate_password
 
 User = get_user_model()
 
+# 회원가입 Serializer
 class SignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -30,7 +31,8 @@ class SignupSerializer(serializers.ModelSerializer):
         token = Token.objects.create(user=user)
         return user
 
-    
+
+# 로그인 Serializer
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required = True)
     # write_only를 통해서 서버 -> 클라이언트 방향의 직렬화를 방지하여 보안 UP
@@ -46,6 +48,8 @@ class LoginSerializer(serializers.Serializer):
             {"error": "Unable to log in"}
         )
 
+
+# 비밀번호 변경 Serializer
 class ChangePwdSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)

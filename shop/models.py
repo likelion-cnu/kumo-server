@@ -15,6 +15,7 @@ class BaseModel(models.Model):
         abstract = True
 
 
+# 쿠폰 테이블
 class Coupon(models.Model):
     writer = models.ForeignKey(CustomerUser, on_delete=models.CASCADE, related_name="shop_writer")
     shopname = models.ForeignKey(ShopUser, on_delete=models.CASCADE, related_name="shop_shopname")
@@ -31,14 +32,14 @@ class Coupon(models.Model):
         super().save(*args,**kwargs)
 
 
-
+# 결제 테이블
 class Payment(models.Model):
     payment_at = models.DateTimeField(auto_now_add=True)
     writer = models.ForeignKey(CustomerUser, on_delete=models.CASCADE)
     shopname = models.ForeignKey(ShopUser, on_delete=models.CASCADE)
 
 
-
+# 리뷰 테이블
 class Review(models.Model):
     writer = models.ForeignKey(CustomerUser, on_delete=models.CASCADE, related_name="review_writer")
     shopname = models.ForeignKey(ShopUser, on_delete=models.CASCADE, related_name="review_shopname")
@@ -46,6 +47,11 @@ class Review(models.Model):
     review_photo = models.ImageField(blank=True)
     review_caption = models.TextField(max_length=100)
 
+<<<<<<< HEAD
+
+# 리뷰 댓글 테이블
+=======
+>>>>>>> 1bb47f7f23db468e565ee23edbc543b75fe14113
 class Review_Comment(BaseModel):
     writer = models.ForeignKey(ShopUser, on_delete=models.CASCADE)
     post = models.ForeignKey(Review, on_delete=models.CASCADE)
@@ -55,11 +61,13 @@ class Review_Comment(BaseModel):
         ordering = ['-id']
 
 
+# 업주 QnA 테이블
 class ShopQna(models.Model):
     title = models.CharField(max_length=20)
     content = models.TextField(max_length=200)
 
 
+# 업주 질문 테이블
 class ShopQuestion(models.Model):
     title = models.CharField(max_length=20)
     content = models.TextField(max_length=200)
