@@ -5,11 +5,11 @@ from . import views
 
 # 내 가게 url
 router = DefaultRouter()
-router.register('myshop/', views.MyShopViewSet, basename='myshop') 
+router.register('myshop', views.MyShopViewSet, basename='myshop') 
 
 # 내 가게 데이터 url
 data_router = DefaultRouter()
-data_router.register('myshop_data/', views.ShopdataView, basename='myshop_data') 
+data_router.register('myshop_data', views.ShopdataView, basename='myshop_data') 
 
 
 # QR 생성시 
