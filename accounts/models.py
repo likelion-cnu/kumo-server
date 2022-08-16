@@ -41,6 +41,7 @@ class User(AbstractUser):
 # 고객 유저
 class CustomerUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    profile_img = models.ImageField(null=True)
     nickname = models.CharField(max_length=10, blank=True)
     points = models.IntegerField(default=0, blank=True)
     level = models.IntegerField(default=0, blank=True)
@@ -80,6 +81,12 @@ class ShopUser(models.Model):
     )
     is_Premium = models.BooleanField(default=False)
     shop_location = models.CharField(blank=False, max_length=100)
+
+    shop_logo = models.ImageField(null=True)
+    shop_image1 = models.ImageField(null=True)
+    shop_image2 = models.ImageField(null=True)
+    shop_image3 = models.ImageField(null=True)
+    shop_image4 = models.ImageField(null=True)
 
     lat = models.FloatField(null=True)
     lng = models.FloatField(null=True)

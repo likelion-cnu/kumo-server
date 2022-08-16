@@ -18,7 +18,7 @@ class ShopUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShopUser
         fields = [
-            "user", "shop_name", "shop_phone_num", "shop_location", "shop_introduction", "shop_sector"
+            "user", "shop_logo", "shop_image1","shop_image2","shop_image3","shop_image4", "shop_name", "shop_phone_num", "shop_location", "shop_introduction", "shop_sector"
         ]
 
 

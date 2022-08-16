@@ -10,7 +10,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomerUser
         fields = [
-            "nickname", "level"
+            "nickname", "level", "profile_img"
         ]
 
 
@@ -35,7 +35,7 @@ class UserProfileEditSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomerUser
         fields = [
-            "nickname", "phone_num"
+            "nickname", "phone_num", "profile_img"
         ]
 
 
