@@ -9,7 +9,6 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.decorators import api_view
 from rest_framework import status, generics
 from rest_framework.decorators import action
-from sympy import true
 
 from accounts.permissons import IsShop
 from accounts.models import User, CustomerUser, ShopUser
