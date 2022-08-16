@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, render
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,22 +12,17 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from shop.models import Coupon, Review
 from accounts.models import ShopUser, User, CustomerUser
 
-from .serializers import MyStampSerializer, CouponHistorySerializer, UserProfileSerializer, ReviewCreatSerializer, UserProfileEditSerializer, SearchSerializer, HomeSerializer, BookmarkSerializer
+from .serializers import MyStampSerializer, CouponHistorySerializer, BookmarkSerializer, ShopbriefSerializer, UserProfileSerializer, ReviewCreatSerializer, ReviewCreateSerializer, UserProfileEditSerializer, SearchSerializer, HomeSerializer, BookmarkSerializer, ShopDetailSerializer, NearShopSerializer
 from shop.serializers import ReviewSerializer, ShopProfileUserSerializer, ShopUserSerializer, CouponeSerializer
 
 from accounts.permissons import IsCustomer
 # Create your views here.
 
 
-########## 루트 페이지에 로그인 되어있는지와 고객 유저인지 확인
-class RootView(APIView):
-    # 고객만 접근 가능하게 permissoin 설정
-    permission_classes = [IsCustomer]
-    pass 
 
+# 홈 뷰
 class HomeView(APIView):
-
-    lookup_field = 'username'
+    #permission_classes = [IsCustomer]
     
     def get(self, request):
         queryset = User.objects.filter(username = self.request.user.username)
@@ -34,42 +30,35 @@ class HomeView(APIView):
         return Response(serializer.data)
 
 
+# 검색 기능
 class SearchListView(generics.ListAPIView):
     queryset = ShopUser.objects.all()
     serializer_class = ShopUserSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['shop_name']
+    #permission_classes = [IsCustomer]
 
-    def get_queryset(self):
-        queryset = ShopUser.objects.all()
-        user = self.request.query_params.get('user')   
-        if user is not None and user.is_axtive :
-            queryset = queryset.objects.filter(user=self.request.user)
-            return queryset
-        else: 
-            return ShopUser.objects.none()
-
-
-
-# 고객 프로필을 띄우는 뷰
-class MyProfileViewSet(viewsets.ViewSet):
-    def list(self, request, pk):
+    filter_backends = [SearchFilter]
+    search_fields = ['shop_name']
+    ordering_fields = ['shop_name']
+    ordering = ['shop_name']
         
+
+# myprofile - 나의 정보
+class MyProfileViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = CustomerUser.objects.all()
+    serializer_class = UserProfileSerializer
+    #permission_classes = [IsCustomer]
+
+    def get(self, request, *args, **kwargs):    
         queryset = CustomerUser.objects.filter(user=self.request.user.username)
         serializer = UserProfileSerializer(queryset, many=True)
-
-        queryset2 = Coupon.objects.filter(writer=self.request.user.username)
-        serializer2 = CouponHistorySerializer(queryset2, many=True)
-
-        return Response(serializer.data + serializer2.data)
+        return Response(serializer.data)
 
 
+# 나의 정보 수정
 class ChangeProfileView(generics.UpdateAPIView):
     queryset = CustomerUser.objects.all()
     serializer_class = UserProfileEditSerializer
-
-    lookup_field = 'user'
-
+    #permission_classes = [IsCustomer]
 
     def get_queryset(self):
         user = CustomerUser.objects.filter(user=self.request.user.username)
@@ -79,55 +68,90 @@ class ChangeProfileView(generics.UpdateAPIView):
         return qs
 
 
-class StampView(generics.ListCreateAPIView):
+# myprofile - 쿠폰 히스토리
+class CouponHistoryViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Coupon.objects.all()
+    serializer_class = CouponHistorySerializer
+    #permission_classes = [IsCustomer]
+
+    def list(self, request, *args, **kwargs):
+        queryset = Coupon.objects.filter(writer=self.request.user.username)
+        serializer = CouponHistorySerializer(queryset, many=True)
+        return Response(serializer.data)
+        #(request, *args, **kwargs)
+
+
+# 내 스탬프
+class StampView(viewsets.ReadOnlyModelViewSet):
     queryset = Coupon.objects.all()
     serializer_class = MyStampSerializer
-    permission_classes = [IsCustomer]
+ #   permission_classes = [IsCustomer]
 
-    def list(self, request):
-        queryset = self.get_queryset()
+    def list(self, request, *args, **kwargs):
+        queryset = Coupon.objects.filter(writer=self.request.user.username)
         serializer = MyStampSerializer(queryset, many=True)
         return Response(serializer.data)
 
 
-class ShopDetailViewSet(viewsets.ModelViewSet):
+# 내 주변 가게 - shop datail
+class ShopDetailView(generics.RetrieveAPIView):
     queryset = ShopUser.objects.all()
-    serializer_class = ShopUserSerializer
-    
+    serializer_class = ShopDetailSerializer
+    #permission_classes = [IsCustomer]
+    lookup_field = 'user'
 
-    def list(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
+        queryset = ShopUser.objects.get(user=self.kwargs.get('user'))
+        serializer = ShopDetailSerializer(queryset)
+        return Response(serializer.data)
 
-        queryset = CustomerUser.objects.filter(review_writer=self.request.user)
-        serializer = UserProfileSerializer(queryset, many=True)
+
+# review 리스트
+class ReviewListView(generics.ListAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewCreatSerializer
+    lookup_field = 'user'
+
+
+# review 생성
+class ReviewCreateView(generics.CreateAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewCreateSerializer
+
+    def perform_create(self, serializer):
+        cu = CustomerUser.objects.get(user=self.request.user.username)
+        # self.kwargs.get('user')은 url에 넘겨진 인자를 가져온다.
+        shop = ShopUser.objects.get(user=self.kwargs.get('user'))
+        serializer.save(writer=cu, shopname=shop)
         
-        review = Review.objects.filter(writer=self.request.user.username)
-        rev_serializer = ReviewSerializer(review, many=True)
-        
-        return Response(serializer.data + rev_serializer.data)
 
-    @action(detail=False, methods=['POST']) 
-    def create(self, request):
-        serializer = ReviewCreatSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-    
+
+# review 수정 및 삭제
+class ReviewUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewCreateSerializer
+
+    def perform_update(self, serializer):
+        cu = CustomerUser.objects.get(user=self.request.user.username)
+        # self.kwargs.get('user')은 url에 넘겨진 인자를 가져온다.
+        shop = ShopUser.objects.get(user=self.kwargs.get('user'))
+        serializer.save(writer=cu, shopname=shop)
 
     def get_queryset(self):
-        user = CustomerUser.objects.filter(user=self.request.user)
-        qs = super().get_queryset()
+        review = Review.objects.get(pk=self.kwargs.get('pk'))
         # 장고의 in은 튜플, 리스트, 쿼리셋 등 반복 가능한 객체를 조회한다. SQL문에서의 WHERE IN과 같은 역할을 한다.
-        qs = qs.filter(user__in=user)
-        return qs
+        return review    
+
 
 # bookmark한 가게들 출력
 class BookmarkView(ReadOnlyModelViewSet):
-    queryset = CustomerUser.objects.all()
-    serializer_class = BookmarkSerializer
-    #permission_classes = [IsCustomer]
+    queryset = ShopUser.objects.all()
+    serializer_class = ShopDetailSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['bookmarked_set']
 
     def list(self, request, *args, **kwargs):
-        queryset = CustomerUser.objects.filter(user=self.request.user.username)
+        queryset = ShopUser.objects.filter(Q(bookmarked_set=self.request.user.username))
         serializer = BookmarkSerializer(queryset, many=True)
         
         coupon = Coupon.objects.filter(writer=self.request.user.username)
@@ -137,29 +161,40 @@ class BookmarkView(ReadOnlyModelViewSet):
 
 
 @api_view(['POST'])
-def Bookmark_add(request):
-    if request.method == 'POST':
-        bookmarked_user = ShopUser.objects.filter(user=request.user.username)
-        request.user.bookmark_set.add(bookmarked_user)
-        bookmarked_user.add(request.user)
-
-    return Response(status=201)
-
-@api_view(['POST'])
-def Bookmark_remove(request):
-    if request.method == 'POST':
-        bookmarked_user = ShopUser.objects.filter(user=request.user.username)
-        request.user.bookmark_set.remove(bookmarked_user)
-        bookmarked_user.remove(request.user)
+def Bookmark_add(request, user):
+    if request.method == 'GET':
+        # 고객 유저를 업주 유저의 bookmarked_set에 추가하고, 삭제
+        shop_user = get_object_or_404(ShopUser, user=user)
+        if request.user in shop_user.bookmarked_set.all():
+            shop_user.bookmarked_set.remove(request.user)
+            request.user.bookmark_set.remove(shop_user)
+        else:
+            shop_user.bookmarked_set.add(request.user)
+            request.user.bookmark_set.add(shop_user)
     return Response(status=201)
 
 
+# 1KM 거리에 있는 가게들만 조회
+class NearShopViewSet(ReadOnlyModelViewSet):
+    queryset = ShopUser.objects.all()
+    serializer_class = NearShopSerializer
 
+    def filter_by_distance_manual(self, qs):
+        """좌표 기준 반경 1km 쿼리"""
+        # data = 고객의 좌표
+        data = self.request.query_params
+        if self.action == 'list':
+            lat = data.get('lat')
+            lng = data.get('lng')
+            if lat and lng:
+                lat = float(lat)
+                lng = float(lng)
+                min_lat = lat - 0.009
+                max_lat = lat + 0.009
+                min_lon = lng - 0.015
+                max_lon = lng + 0.01
 
-
-
-# 고객의 QNA를 띄우는 뷰
-class CustomerQnaView(APIView):
-    # 고객만 접근 가능하게 permissoin 설정
-    permission_classes = [IsCustomer]
-    pass
+                # 최소, 최대 위경도를 1km씩 설정해서 쿼리
+                qs = qs.filter(lat__gte=min_lat, lat__lte=max_lat,
+                            lng__gte=min_lon, lng__lte=max_lon)
+        return qs

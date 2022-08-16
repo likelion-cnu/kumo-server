@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from shop.models import Coupon, Review, Review_Comment
 from accounts.models import ShopUser, CustomerUser, User
+from rest_framework.authtoken.models import Token
+from django.shortcuts import get_object_or_404
+
 
 #MYPROFILE
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -10,12 +13,23 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "nickname", "level"
         ]
 
+
+#MYPROFILE
+class NearShopSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShopUser
+        fields = [
+            "shop_name", "lat", "lng", "shop_phone_num"
+        ]
+
+
 class CouponHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Coupon
         fields = [
             "writer", "shopname", "created_at", "coupon_num"
         ]
+
 
 class UserProfileEditSerializer(serializers.ModelSerializer):
     class Meta:
@@ -33,6 +47,7 @@ class MyStampSerializer(serializers.ModelSerializer):
             "writer", "shopname", "coupon_num", "stamp_num"
         ]
 
+
 #BOOKMARK
 class BookmarkSerializer(serializers.ModelSerializer):
     class Meta:
@@ -41,7 +56,6 @@ class BookmarkSerializer(serializers.ModelSerializer):
            "bookmark_set"
         ]
 
-#NEIGHBORHOOD
 
 #SHOPPROFILE
 class ShopbriefSerializer(serializers.ModelSerializer):
@@ -51,26 +65,64 @@ class ShopbriefSerializer(serializers.ModelSerializer):
            "shop_name", "shop_phone_num", "shop_sector"
         ]
 
+
 ###SHOPDETAIL
 class ShopDetailSerializer(serializers.ModelSerializer):
-    coupon_num = serializers.CharField(source = Coupon.coupon_num)
-    stamp_num = serializers.CharField(source = Coupon.stamp_num)
+    #is_bookmarked = serializers.SerializerMethodField(method_name='bookmark')
     class Meta:
         model = ShopUser
         fields = [
-            "shop_name", "shop_phone_num", "shop_sector", "coupon_num", "stamp_num", "shop_introduction"
+           "bookmarked_set", "shop_name", "shop_phone_num", "shop_sector", "shop_introduction"
         ]
         
+    # def bookmark(self, obj):        
+    #     #shop = ShopUser.objects.get(shop_name=obj.user.username)      
+    #     article = get_object_or_404(ShopUser, user=obj.user.username)
+    #     if CustomerUser.objects.filter(bookmark_set=article) is not None:
+    #         is_bookmarked = True
+    #     else:
+    #         is_bookmarked = False
+    #     # if shop.user in cu.bookmark_set.all():
+    #     #     is_bookmarked = True
+    #     # else:
+    #     #     is_bookmarked = False
+        
+    #     return "hi"
+    
+#SHOPPROFILE
+class ShopbookmarjSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShopUser
+        fields = [
+           "is_bookmarked", "shop_phone_num", "shop_sector"
+        ]
+
+# class ShopDetailSerializer(serializers.Serializer):
+#     is_bookmarked = serializers.BooleanField()
+#     shop_name = serializers.CharField()
+#     shop_phone_num = serializers.CharField()
+#     shop_sector = serializers.CharField()
+#     shop_introduction = serializers.CharField()
+
+#     def create(self, validated_data):
+#         return super().create(validated_data)
+
+
+
 class ReviewCreatSerializer(serializers.ModelSerializer):
-    message = serializers.CharField(source = Review_Comment.message)
     class Meta:
         model = Review
         fields = [
-            "review_writer", "review_star", "review_photo", "review_caption", "message"
+            "writer", "shopname", "review_star", "review_photo", "review_caption"
         ]
     
+
+class ReviewCreateSerializer(serializers.ModelSerializer):
     class Meta:
-        ordering = ['-id']
+        model = Review
+        fields = [
+            "writer", "shopname", "review_star", "review_photo", "review_caption"
+        ]
 
 
 #SEARCH        

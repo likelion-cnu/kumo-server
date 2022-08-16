@@ -55,17 +55,17 @@ class CustomerUser(models.Model):
     def save(self,*args,**kwargs):
         self.points += 100
         if self.level == 0:
-                self.points >= 2000
-                self.level += 1
-                self.points -= 2000
+                if self.points >= 2000:
+                    self.level += 1
+                    self.points -= 2000
         elif self.level == 1:
-                self.points >= 3000
-                self.level += 1
-                self.points -= 3000
+                if self.points >= 3000:
+                    self.level += 1
+                    self.points -= 3000
         else:
-            self.points >= 4000
-            self.level += 1
-            self.points -= 4000
+            if self.points >= 4000:
+                self.level += 1
+                self.points -= 4000
         super().save(*args,**kwargs)
 
 
@@ -80,9 +80,14 @@ class ShopUser(models.Model):
     )
     is_Premium = models.BooleanField(default=False)
     shop_location = models.CharField(blank=False, max_length=100)
+
+    lat = models.FloatField(null=True)
+    lng = models.FloatField(null=True)
+    
     shop_introduction = models.TextField(blank=False)
     shop_sector = models.CharField(blank=False, max_length=10)
     bookmarked_set = models.ManyToManyField('CustomerUser', blank=True)
+    is_bookmarked = models.BooleanField(null=True)
     
 
 

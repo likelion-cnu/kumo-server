@@ -10,45 +10,44 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-from datetime import timedelta
+
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
-import os, json
+import os
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
+# # 환경변수를 불러올 수 있는 상태로 세팅
+# env = environ.Env(
+#     # set casting, default value
+#     DEBUG=(bool, True)
+# )
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# environ.Env.read_env(
+#     env_file=os.path.join(BASE_DIR, '.env')
+# )
 
-secret_file = os.path.join(BASE_DIR, 'secret.json')
+def get_env_variable(var_name):
+  try:
+    return os.environ[var_name]
+  except KeyError:
+    error_msg = 'Set the {} environment variable'.format(var_name)
+    raise ImproperlyConfigured(error_msg)
 
-
-with open(secret_file) as f:
-    secrets = json.loads(f.read())
-
-
-def get_secret(setting, secrets=secrets):
-    try:
-        return secrets[setting]
-    except KeyError:
-        error_msg = "Set the {} environment variable".format(setting)
-        raise ImproperlyConfigured(error_msg)
-
-
-SECRET_KEY = get_secret("SECRET_KEY")
+SECRET_KEY = get_env_variable('SECRET_KEY')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
 
@@ -71,10 +70,13 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_filters',
     'django.contrib.sites',
+    'corsheaders',
+    'drf_yasg',
 ]
 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -82,6 +84,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 
@@ -112,8 +115,12 @@ WSGI_APPLICATION = 'KUMO.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': str(os.path.join(BASE_DIR, "db.sqlite3")),
+        'ENGINE': 'django.db.backends.mysql', 
+        'NAME': get_env_variable('NAME'), 
+        'USER': get_env_variable('USER'), 
+        'PASSWORD': get_env_variable('PASSWORD'), 
+        'HOST': get_env_variable('HOST'), 
+        'PORT': get_env_variable('PORT'), 
     }
 }
 

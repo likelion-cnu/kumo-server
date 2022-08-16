@@ -11,7 +11,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.views.decorators.csrf import csrf_exempt
 
-from .serializers import LoginSerializer, SignupSerializer, ChangePwdSerializer
+from .serializers import LoginSerializer, SignupSerializer, ChangePwdSerializer, WhenLoginGiveBoolean
 from .models import  User, CustomerUser
 from . import models
 
@@ -31,7 +31,10 @@ class LoginView(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         token = serializer.validated_data # LoginSerializer안의 validate()의 리턴값인 Token을 받아옴
-        return Response({"token": token.key}, status=status.HTTP_200_OK)
+        qurey_bo = get_object_or_404(User, username=request.user)
+        serial_bo = WhenLoginGiveBoolean(qurey_bo)#status=status.HTTP_200_OK
+        # {"token": token.key},
+        return Response({"token": token.key, "is_shop":serial_bo.data}, status=status.HTTP_200_OK)
 
 
 # 로그아웃하고, 토큰 삭제

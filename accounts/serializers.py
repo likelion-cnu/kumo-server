@@ -1,3 +1,4 @@
+from dataclasses import fields
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from rest_framework.validators import UniqueValidator
@@ -44,9 +45,15 @@ class LoginSerializer(serializers.Serializer):
             token = Token.objects.get(user=user)
             return token
         
-        raise serializers.ValidationError(
-            {"error": "Unable to log in"}
-        )
+        # raise serializers.ValidationError(
+        #     {"error": "Unable to log in"}
+        # )
+
+
+class WhenLoginGiveBoolean(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("is_shop",)
 
 
 # 비밀번호 변경 Serializer
