@@ -42,7 +42,7 @@ SECRET_KEY = get_env_variable('SECRET_KEY')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -116,11 +116,14 @@ WSGI_APPLICATION = 'KUMO.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', 
-        'NAME': get_env_variable('NAME'), 
-        'USER': get_env_variable('USER'), 
-        'PASSWORD': get_env_variable('PASSWORD'), 
-        'HOST': get_env_variable('HOST'), 
-        'PORT': get_env_variable('PORT'), 
+        'NAME': get_env_variable('DATABASE'), 
+        'USER': get_env_variable('DB_USER'), 
+        'PASSWORD': get_env_variable('DB_PASSWORD'), 
+        'HOST': get_env_variable('DB_HOST'), 
+        'PORT': get_env_variable('DB_PORT'), 
+        'OPTIONS':{
+            'init_command' : "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
     }
 }
 
