@@ -43,7 +43,7 @@ class LoginSerializer(serializers.Serializer):
         user = authenticate(**data)
         if user:
             token = Token.objects.get(user=user)
-            return token        
+            return {"token":token, "User":User.objects.get(username=user.username)}         
         raise serializers.ValidationError(
             {"error": "Unable to log in"}
         )
