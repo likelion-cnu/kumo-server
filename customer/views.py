@@ -1,3 +1,6 @@
+from asyncio.windows_events import NULL
+from re import L
+from unittest import result
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, render
 from rest_framework.response import Response
@@ -147,13 +150,19 @@ class ReviewUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 class BookmarkView(ReadOnlyModelViewSet):
     queryset = ShopUser.objects.all()
     serializer_class = ShopDetailSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['bookmarked_set']
+
 
     def list(self, request, *args, **kwargs):
-        queryset = ShopUser.objects.filter(Q(bookmarked_set=self.request.user.username))
-        serializer = BookmarkSerializer(queryset, many=True)
-        
+        customer_user = get_object_or_404(CustomerUser, user=request.user.username)
+        bookmark_list = customer_user.bookmark_set.all()
+
+        book_result = []
+        for i in range(len(bookmark_list)-1):
+            book_result.append(bookmark_list[i])
+            
+        result = ShopUser.objects.filter(user__in=book_result)
+        serializer = ShopbriefSerializer(result, many=True)
+
         coupon = Coupon.objects.filter(writer=self.request.user.username)
         cu_serializer = CouponeSerializer(coupon, many=True)
         
@@ -162,16 +171,17 @@ class BookmarkView(ReadOnlyModelViewSet):
 
 @api_view(['POST'])
 def Bookmark_add(request, user):
-    if request.method == 'GET':
+    if request.method == 'POST':
         # 고객 유저를 업주 유저의 bookmarked_set에 추가하고, 삭제
         shop_user = get_object_or_404(ShopUser, user=user)
-        if request.user in shop_user.bookmarked_set.all():
-            shop_user.bookmarked_set.remove(request.user)
-            request.user.bookmark_set.remove(shop_user)
+        customer_user = get_object_or_404(CustomerUser, user=request.user)
+        if customer_user in shop_user.bookmarked_set.all():
+            shop_user.bookmarked_set.remove(customer_user)
+            customer_user.bookmark_set.remove(shop_user)
         else:
-            shop_user.bookmarked_set.add(request.user)
-            request.user.bookmark_set.add(shop_user)
-    return Response(status=201)
+            shop_user.bookmarked_set.add(customer_user)
+            customer_user.bookmark_set.add(shop_user)
+        return Response(status=201)
 
 
 # 1KM 거리에 있는 가게들만 조회

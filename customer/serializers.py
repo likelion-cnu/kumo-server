@@ -1,3 +1,4 @@
+from urllib import request
 from rest_framework import serializers
 from shop.models import Coupon, Review, Review_Comment
 from accounts.models import ShopUser, CustomerUser, User
@@ -57,6 +58,33 @@ class BookmarkSerializer(serializers.ModelSerializer):
         ]
 
 
+
+
+# class BookmarkSerializer(serializers.ModelSerializer):
+#     shop_name = serializers.SerializerMethodField(method_name='bookmark_shop')
+#     class Meta:
+#         model = CustomerUser
+#         fields = [
+#            "bookmark_set", "shop_name"
+#         ]
+
+#     def bookmark_shop(self, obj):
+#         shop_queryset = ShopUser.objects.get(user=self.bookmark_set)
+#         shop_name = ShopNameSerializer(data=request.data)
+#         return shop_name
+
+
+#SHOPPROFILE
+class ShopNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShopUser
+        fields = [
+           "shop_name"
+        ]
+
+
+
+
 #SHOPPROFILE
 class ShopbriefSerializer(serializers.ModelSerializer):
     class Meta:
@@ -89,13 +117,13 @@ class ShopDetailSerializer(serializers.ModelSerializer):
         
     #     return "hi"
     
-#SHOPPROFILE
-class ShopbookmarjSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ShopUser
-        fields = [
-           "is_bookmarked", "shop_phone_num", "shop_sector"
-        ]
+# #SHOPPROFILE
+# class ShopbookmarjSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ShopUser
+#         fields = [
+#            "is_bookmarked", "shop_phone_num", "shop_sector"
+#         ]
 
 # class ShopDetailSerializer(serializers.Serializer):
 #     is_bookmarked = serializers.BooleanField()

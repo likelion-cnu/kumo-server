@@ -96,6 +96,9 @@ class ShopUser(models.Model):
     bookmarked_set = models.ManyToManyField('CustomerUser', blank=True)
     is_bookmarked = models.BooleanField(null=True)
     
+    def bookmark_set(self):      
+        shopuser = self.bookmarked_set.all()
+        return shopuser
 
 
 
