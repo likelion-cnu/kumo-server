@@ -14,8 +14,7 @@ import random
 # 통합 유저
 class User(AbstractUser):
     username = models.CharField(primary_key=True, max_length=10, unique=True)
-    nickname = models.CharField(max_length=10, unique=True, null=True)
-    profile_img = models.ImageField(upload_to='profile_img', null=True)
+    nickname = models.CharField(max_length=10, null=True)
     phone_num = models.CharField(
         max_length=13,
         blank=False,
@@ -74,6 +73,7 @@ class CustomerUser(models.Model):
 class ShopUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     shop_name = models.CharField(max_length=15, blank=False)
+    shop_runtime = models.CharField(max_length=10, null=True)
     shop_phone_num = models.CharField(
         max_length=13,
         blank=False,
@@ -81,7 +81,7 @@ class ShopUser(models.Model):
     )
     is_Premium = models.BooleanField(default=False)
     shop_location = models.CharField(blank=False, max_length=100)
-
+    
     shop_logo = models.ImageField(null=True)
     shop_image1 = models.ImageField(null=True)
     shop_image2 = models.ImageField(null=True)

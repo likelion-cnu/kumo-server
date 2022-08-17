@@ -15,18 +15,18 @@ class SignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            "username", "password", "nickname", "profile_img", "phone_num", "is_shop"
+            "username", "password", "nickname", "phone_num", "is_shop"
         ]
 
     # 유효성 검사를 통과할 때
     def create(self, validated_data):
         user = User.objects.create(username=validated_data["username"], 
             nickname = validated_data["nickname"],
-            profile_img = validated_data["profile_img"],
             phone_num = validated_data["phone_num"],
             is_shop=validated_data["is_shop"],
             )
-
+        if user is None:
+            return {"error": "Unable to log in"}     
         user.set_password(validated_data["password"])
         user.save()
         token = Token.objects.create(user=user)
@@ -37,23 +37,22 @@ class SignupSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required = True)
     # write_only를 통해서 서버 -> 클라이언트 방향의 직렬화를 방지하여 보안 UP
-    password = serializers.CharField(required = True, write_only=True)
+    password = serializers.CharField(required = True)
 
     def validate(self, data):
         user = authenticate(**data)
         if user:
             token = Token.objects.get(user=user)
-            return token
-        
-        # raise serializers.ValidationError(
-        #     {"error": "Unable to log in"}
-        # )
+            return token        
+        raise serializers.ValidationError(
+            {"error": "Unable to log in"}
+        )
 
 
 class WhenLoginGiveBoolean(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("is_shop",)
+        fields = ("is_shop", "username")
 
 
 # 비밀번호 변경 Serializer
