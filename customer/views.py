@@ -1,6 +1,3 @@
-from asyncio.windows_events import NULL
-from re import L
-from unittest import result
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, render
 from rest_framework.response import Response
