@@ -137,19 +137,11 @@ class ShopDetailSerializer(serializers.ModelSerializer):
 
 
 
-class ReviewCreatSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Review
-        fields = [
-            "writer", "shopname", "review_star", "review_photo", "review_caption"
-        ]
-    
-
 class ReviewCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = [
-            "writer", "shopname", "review_star", "review_photo", "review_caption"
+            "review_star", "review_photo", "review_caption"
         ]
 
 

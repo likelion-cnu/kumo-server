@@ -30,8 +30,6 @@ urlpatterns = [
     path('shop/', include('shop.urls')),
     path('customer/', include('customer.urls')),
     
-    path('api-auth/', include('rest_framework.urls')),
-
     # API document generation with  drf_yasg
     url(r'^swagger(?P<format>\.json|\.yaml)/$', schema_view_v1.without_ui(cache_timeout=0), name='schema-json'),
     url(r'^swagger/$', schema_view_v1.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

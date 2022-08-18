@@ -12,7 +12,6 @@ class QRcodeSerializer(serializers.ModelSerializer):
             "writer", "shopname"
         ]
 
-
 # Shop User Serializer
 class ShopUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,7 +35,7 @@ class ShopProfileEditSerializer(serializers.ModelSerializer):
     class Meta:
             model = ShopUser
             fields = [
-                "user", "shop_name", "shop_phone_num"
+                "shop_name", "shop_phone_num"
             ]
 
 
@@ -71,5 +70,5 @@ class CouponeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coupon
         fields = [
-            "writer", "shopname", "coupon_num", "stamp_num", "created_at"
+            "coupon_num", "stamp_num", "created_at"
         ]

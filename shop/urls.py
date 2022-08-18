@@ -12,15 +12,15 @@ data_router = DefaultRouter()
 data_router.register('myshop_data', views.ShopdataView, basename='myshop_data') 
 
 
-# QR 생성시 
-check_qrcode = views.Check_QRcodeViewSet.as_view({
-    'post' : 'create',
-})
+# # QR 생성시 
+# check_qrcode = views.Check_QRcodeViewSet.as_view({
+#     'post' : 'create',
+# })
 
-# QR 업데이트 시
-check_detail_qrcode = views.Check_QRcodeViewSet.as_view({
-    'put' : 'update',
-})
+# # QR 업데이트 시
+# check_detail_qrcode = views.Check_QRcodeViewSet.as_view({
+#     'put' : 'update',
+# })
 
 # 업주 프로필 
 shop_profile = views.ProfileViewSet.as_view({
@@ -33,8 +33,10 @@ urlpatterns = [
     
 
     # QR 체크해주는 뷰 Check_QRcode-> POST, get_Check_QRcode-> PUT
-    path("Check_QRcode/", check_qrcode),
-    path("get_Check_QRcode/", check_detail_qrcode),
+    path("coupon_create/<str:user>/", views.Coupon_add),
+    path("coupon_put/<str:user>/", views.Coupon_put),
+    # path("Check_QRcode/", check_qrcode),
+    # path("get_Check_QRcode/", check_detail_qrcode),
     
     
     # 내 가게 데이터

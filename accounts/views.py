@@ -11,11 +11,11 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.views.decorators.csrf import csrf_exempt
 
-from .serializers import LoginSerializer, SignupSerializer, ChangePwdSerializer, WhenLoginGiveBoolean
+from .serializers import LoginSerializer, SignupSerializer, ChangePasswordSerializer, WhenLoginGiveBoolean
 from .models import  User, CustomerUser
 from . import models
 
-
+User_all = get_user_model()
 
 # 회원가입하고, 토큰 발행
 class SignupView(generics.CreateAPIView):
@@ -32,6 +32,7 @@ class LoginView(generics.GenericAPIView):
         token_user = serializer.validated_data # LoginSerializer안의 validate()의 리턴값인 Token을 받아옴
         token = token_user["token"]
         user = token_user["User"]
+        request.session['user'] = user.username
         #qurey_bo = get_object_or_404(User, username=request.user.username)
         #qurey_bo = User.objects.get(username=request.user)
         serial_bo = WhenLoginGiveBoolean(user)#status=status.HTTP_200_OK
@@ -42,22 +43,34 @@ class LoginView(generics.GenericAPIView):
 class LogoutView(APIView):
     def get(self, request, format=None):
         # simply delete the token to force a login
-        request.user.auth_token.delete()
+        # request.user.auth_token.delete()
+        if request.session.get('user'):
+            del(request.session['user'])
         return Response(status=status.HTTP_200_OK)
 
 
 # 비밀번호 변경
 class ChangePwdView(generics.UpdateAPIView):
-    queryset = User.objects.all()
-    serializer_class = ChangePwdSerializer
+    serializer_class = ChangePasswordSerializer
     # GenericAPIView에서 lookup_field의 역할은 update할 대상이 되는 object를 지정해준다ㅏ.
     lookup_field = 'username'
 
+    def get_object(self, queryset=None):
+        return self.request.user
 
-    def get_queryset(self):
-        user = User.objects.filter(username=self.request.user.username)
-        qs = super().get_queryset()
-        # 장고의 in은 튜플, 리스트, 쿼리셋 등 반복 가능한 객체를 조회한다. SQL문에서의 WHERE IN과 같은 역할을 한다.
-        qs = qs.filter(username__in=user)
-        return qs
+    def put(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = ChangePasswordSerializer(data=request.data)
 
+        if serializer.is_valid():
+            # Check old password
+            old_password = serializer.data.get("old_password")
+            if not self.object.check_password(old_password):
+                return Response({"old_password": ["Wrong password."]}, 
+                                status=status.HTTP_400_BAD_REQUEST)
+            # set_password also hashes the password that the user will get
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

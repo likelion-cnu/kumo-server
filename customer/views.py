@@ -1,8 +1,10 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, render
+from django.http import Http404
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import viewsets, mixins, generics
+from rest_framework import viewsets, mixins, generics, status
 from rest_framework.decorators import api_view
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -12,13 +14,14 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from shop.models import Coupon, Review
 from accounts.models import ShopUser, User, CustomerUser
 
-from .serializers import MyStampSerializer, CouponHistorySerializer, BookmarkSerializer, ShopbriefSerializer, UserProfileSerializer, ReviewCreatSerializer, ReviewCreateSerializer, UserProfileEditSerializer, SearchSerializer, HomeSerializer, BookmarkSerializer, ShopDetailSerializer, NearShopSerializer
+from .serializers import MyStampSerializer, CouponHistorySerializer, BookmarkSerializer, ShopbriefSerializer, UserProfileSerializer, ReviewCreateSerializer, UserProfileEditSerializer, SearchSerializer, HomeSerializer, BookmarkSerializer, ShopDetailSerializer, NearShopSerializer
 from shop.serializers import ReviewSerializer, ShopProfileUserSerializer, ShopUserSerializer, CouponeSerializer
 
 from accounts.permissons import IsCustomer
 # Create your views here.
 
-
+# 세션
+# request.session('user')
 
 # 홈 뷰
 class HomeView(APIView):
@@ -44,21 +47,25 @@ class SearchListView(generics.ListAPIView):
 
 # myprofile - 나의 정보
 class MyProfileViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = CustomerUser.objects.all()
     serializer_class = UserProfileSerializer
     #permission_classes = [IsCustomer]
 
-    def get(self, request, *args, **kwargs):    
-        queryset = CustomerUser.objects.filter(user=self.request.user.username)
+    def list(self, request, *args, **kwargs):    
+        queryset = CustomerUser.objects.filter(user__in=[request.user.username])
         serializer = UserProfileSerializer(queryset, many=True)
         return Response(serializer.data)
+    
+    def get_queryset(self):
+        return self.request.user
+
 
 
 # 나의 정보 수정
 class ChangeProfileView(generics.UpdateAPIView):
     queryset = CustomerUser.objects.all()
     serializer_class = UserProfileEditSerializer
-    #permission_classes = [IsCustomer]
+    #permission_classes = [IsCustomer]  
+    lookup_field = 'user'
 
     def get_queryset(self):
         user = CustomerUser.objects.filter(user=self.request.user.username)
@@ -109,7 +116,7 @@ class ShopDetailView(generics.RetrieveAPIView):
 # review 리스트
 class ReviewListView(generics.ListAPIView):
     queryset = Review.objects.all()
-    serializer_class = ReviewCreatSerializer
+    serializer_class = ReviewCreateSerializer
     lookup_field = 'user'
 
 
@@ -125,7 +132,6 @@ class ReviewCreateView(generics.CreateAPIView):
         serializer.save(writer=cu, shopname=shop)
         
 
-
 # review 수정 및 삭제
 class ReviewUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
@@ -137,8 +143,9 @@ class ReviewUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
         shop = ShopUser.objects.get(user=self.kwargs.get('user'))
         serializer.save(writer=cu, shopname=shop)
 
+
     def get_queryset(self):
-        review = Review.objects.get(pk=self.kwargs.get('pk'))
+        review = Review.objects.filter(pk=self.kwargs.get('pk'))
         # 장고의 in은 튜플, 리스트, 쿼리셋 등 반복 가능한 객체를 조회한다. SQL문에서의 WHERE IN과 같은 역할을 한다.
         return review    
 
@@ -160,7 +167,7 @@ class BookmarkView(ReadOnlyModelViewSet):
         result = ShopUser.objects.filter(user__in=book_result)
         serializer = ShopbriefSerializer(result, many=True)
 
-        coupon = Coupon.objects.filter(writer=self.request.user.username)
+        coupon = Coupon.objects.filter(shopname__in=book_result)
         cu_serializer = CouponeSerializer(coupon, many=True)
         
         return Response(serializer.data + cu_serializer.data)
@@ -185,6 +192,11 @@ def Bookmark_add(request, user):
 class NearShopViewSet(ReadOnlyModelViewSet):
     queryset = ShopUser.objects.all()
     serializer_class = NearShopSerializer
+    
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = self.filter_by_distance_manual(qs)
+        return qs
 
     def filter_by_distance_manual(self, qs):
         """좌표 기준 반경 1km 쿼리"""

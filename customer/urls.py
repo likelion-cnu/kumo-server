@@ -32,10 +32,9 @@ urlpatterns = [
     path('home/', views.HomeView.as_view(), name='view'),
     path('shop_detail/<str:user>/', views.ShopDetailView.as_view(), name='ShopDetailView'),
     path('profile/', myprofile),
-    path('change_profile/', views.ChangeProfileView.as_view(), name="change_profile"),
+    path('change_profile/<str:user>/', views.ChangeProfileView.as_view(), name="change_profile"),
     path('couponhistory/', couponhistory), 
     path('bookmark_add/<str:user>/', views.Bookmark_add),
-    #path('bookmark/', views.BookmarkView.as_view()), # 북마크 리스트
     path('bookmark/', bookmark), # 북마크 리스트
     path('review_create/<str:user>/', views.ReviewCreateView.as_view(), name='cu_review'), # 가게 리뷰 생성, 수정하기
     path('review_list/<str:user>/', views.ReviewListView.as_view()), # 가게 리뷰 읽어오기

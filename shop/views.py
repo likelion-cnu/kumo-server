@@ -25,33 +25,54 @@ class RootView(APIView):
 
 
 # QR 체크하고, 고객의 쿠폰의 스탬프 개수, 유저 레벨, 결제 정보를 올리는 뷰 // POST, UPDATE
-class Check_QRcodeViewSet(viewsets.ViewSet):
-    #permission_classes = [IsShop]
+@api_view(['POST'])
+def Coupon_add(request, user):
+    if request.method == 'POST':
+        cu = CustomerUser.objects.get(user=user)
+        # self.kwargs.get('user')은 url에 넘겨진 인자를 가져온다.
+        shop = ShopUser.objects.get(user=request.user.username)
+        Coupon.objects.create(writer=cu, shopname=shop)
+        Payment.objects.create(writer=cu, shopname=shop)
+        return Response(status=201)
 
-    def create(self, request):
-        serializer = QRcodeSerializer(data=request.data)
-        payment_serializer = PaymentSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            if payment_serializer.is_valid():
-                payment_serializer.save()
-                return Response(serializer.data, status=201)
-
-        return Response(serializer.errors, status=400)
-
-    def update(self, request):
-        coupon = get_object_or_404(Coupon, writer=request.data['writer'], 
-                                        shopname=request.data['shopname'])
-        coupon.save()
+@api_view(['PUT'])
+def Coupon_put(request, user):
+    if request.method == 'PUT':
+        cu = CustomerUser.objects.get(user=user)
+        # self.kwargs.get('user')은 url에 넘겨진 인자를 가져온다.
+        shop = ShopUser.objects.get(user=request.user.username)
         
-        user_level = get_object_or_404(CustomerUser, user=request.data['writer'])
-        user_level.save()
+        coupon = Coupon.objects.get(writer=cu, shopname=shop)
+        coupon.save()
+        Payment.objects.create(writer=cu, shopname=shop)
+        return Response(status=201)
 
-        review_serializer = PaymentSerializer(data=request.data)
-        if review_serializer.is_valid():
-            review_serializer.save()
+# class Check_QRcodeViewSet(viewsets.ViewSet):
+#     #permission_classes = [IsShop]
+#     queryset = Coupon.objects.all()
+#     serializer_class = CouponeSerializer
+
+#     def create(self, request):
+#         Coupon.objects.create()
+#         payment_serializer = PaymentSerializer(data=request.data)
+#         if payment_serializer.is_valid():
+#             payment_serializer.save()
+#             return Response(payment_serializer.data, status=201)
+
+
+#     def update(self, request):
+#         coupon = get_object_or_404(Coupon, writer=request.data['writer'], 
+#                                         shopname=request.user.username)
+#         coupon.save()
+        
+#         user_level = get_object_or_404(CustomerUser, user=request.data['writer'])
+#         user_level.save()
+
+#         review_serializer = PaymentSerializer(data=request.data)
+#         if review_serializer.is_valid():
+#             review_serializer.save()
             
-        return Response(status=status.HTTP_200_OK)
+#         return Response(status=status.HTTP_200_OK)
        
 
 
@@ -133,12 +154,11 @@ class ChangeProfileView(generics.UpdateAPIView):
 
     lookup_field = 'user'
 
-
     def get_queryset(self):
-        user = ShopUser.objects.filter(user=self.request.user.username)
+        user = ShopUser.objects.get(user=self.kwargs.get('user'))
         qs = super().get_queryset()
         # 장고의 in은 튜플, 리스트, 쿼리셋 등 반복 가능한 객체를 조회한다. SQL문에서의 WHERE IN과 같은 역할을 한다.
-        qs = qs.filter(user__in=user)
+        qs = qs.filter(user=user)
         return qs
 
 
