@@ -46,7 +46,7 @@ class LogoutView(APIView):
         # request.user.auth_token.delete()
         if request.session.get('user'):
             del(request.session['user'])
-        return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_200_OK)
 
 
 # 비밀번호 변경
