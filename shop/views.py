@@ -25,27 +25,36 @@ class RootView(APIView):
 
 
 # QR 체크하고, 고객의 쿠폰의 스탬프 개수, 유저 레벨, 결제 정보를 올리는 뷰 // POST, UPDATE
-@api_view(['POST'])
+@api_view(['GET'])
 def Coupon_add(request, user):
-    if request.method == 'POST':
-        cu = CustomerUser.objects.get(user=user)
-        # self.kwargs.get('user')은 url에 넘겨진 인자를 가져온다.
-        shop = ShopUser.objects.get(user=request.user.username)
-        Coupon.objects.create(writer=cu, shopname=shop)
-        Payment.objects.create(writer=cu, shopname=shop)
-        return Response(status=201)
+    cu = CustomerUser.objects.get(user=user)
+    shop = ShopUser.objects.get(user=request.user.username)
+    coupons =  Coupon.objects.filter(writer=cu, shopname=shop)
+    if coupons:
+        if request.method == 'GET':
+            for coupon in coupons:
+                coupon.save()
+            Payment.objects.create(writer=cu, shopname=shop)
+            return Response(status=201)
+    else:    
+        if request.method == 'GET':
+            Coupon.objects.create(writer=cu, shopname=shop)
+            Payment.objects.create(writer=cu, shopname=shop)
+            return Response(status=201)
 
-@api_view(['PUT'])
-def Coupon_put(request, user):
-    if request.method == 'PUT':
-        cu = CustomerUser.objects.get(user=user)
-        # self.kwargs.get('user')은 url에 넘겨진 인자를 가져온다.
-        shop = ShopUser.objects.get(user=request.user.username)
+
+# @api_view(['PUT'])
+# def Coupon_put(request, user):
+#     if request.method == 'PUT':
+#         cu = CustomerUser.objects.get(user=user)
+#         # self.kwargs.get('user')은 url에 넘겨진 인자를 가져온다.
+#         shop = ShopUser.objects.get(user=request.user.username)
         
-        coupon = Coupon.objects.get(writer=cu, shopname=shop)
-        coupon.save()
-        Payment.objects.create(writer=cu, shopname=shop)
-        return Response(status=201)
+#         coupon = Coupon.objects.get(writer=cu, shopname=shop)
+#         coupon.save()
+#         Payment.objects.create(writer=cu, shopname=shop)
+#         return Response(status=201)
+
 
 # class Check_QRcodeViewSet(viewsets.ViewSet):
 #     #permission_classes = [IsShop]

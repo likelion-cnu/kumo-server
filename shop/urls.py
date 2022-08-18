@@ -34,11 +34,8 @@ urlpatterns = [
 
     # QR 체크해주는 뷰 Check_QRcode-> POST, get_Check_QRcode-> PUT
     path("coupon_create/<str:user>/", views.Coupon_add),
-    path("coupon_put/<str:user>/", views.Coupon_put),
-    # path("Check_QRcode/", check_qrcode),
-    # path("get_Check_QRcode/", check_detail_qrcode),
-    
-    
+    # path("coupon_put/<str:user>/", views.Coupon_put),
+
     # 내 가게 데이터
     path("", include(router.urls)),
 
