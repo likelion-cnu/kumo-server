@@ -2,6 +2,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, render
 from django.http import Http404
 
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets, mixins, generics, status
@@ -25,8 +26,7 @@ from accounts.permissons import IsCustomer
 
 # 홈 뷰
 class HomeView(APIView):
-    #permission_classes = [IsCustomer]
-    
+    #permission_classes = [IsCustomer]    
     def get(self, request):
         queryset = User.objects.filter(username = self.request.user.username)
         serializer = HomeSerializer(queryset, many=True)
@@ -95,8 +95,9 @@ class StampView(viewsets.ReadOnlyModelViewSet):
  #   permission_classes = [IsCustomer]
 
     def list(self, request, *args, **kwargs):
-        queryset = Coupon.objects.filter(writer=self.request.user.username)
+        queryset = Coupon.objects.filter(writer=self.request.user)
         serializer = MyStampSerializer(queryset, many=True)
+     
         return Response(serializer.data)
 
 

@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
 
+from rest_framework.authentication import TokenAuthentication
 from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
@@ -21,11 +22,13 @@ User_all = get_user_model()
 class SignupView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = SignupSerializer
-
+    authentication_classes = [TokenAuthentication]
+    
 # 로그인하고, 유저에 맞는 토큰 가져오기
 class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
-    
+    authentication_classes = [TokenAuthentication]
+        
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -41,6 +44,8 @@ class LoginView(generics.GenericAPIView):
 
 # 로그아웃하고, 토큰 삭제
 class LogoutView(APIView):
+    authentication_classes = [TokenAuthentication]
+    
     def get(self, request, format=None):
         # simply delete the token to force a login
         # request.user.auth_token.delete()
@@ -52,6 +57,7 @@ class LogoutView(APIView):
 # 비밀번호 변경
 class ChangePwdView(generics.UpdateAPIView):
     serializer_class = ChangePasswordSerializer
+    authentication_classes = [TokenAuthentication]
     # GenericAPIView에서 lookup_field의 역할은 update할 대상이 되는 object를 지정해준다ㅏ.
     lookup_field = 'username'
 

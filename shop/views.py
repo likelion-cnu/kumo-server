@@ -38,7 +38,7 @@ def Coupon_add(request, user):
             return Response(status=201)
     else:    
         if request.method == 'GET':
-            Coupon.objects.create(writer=cu, shopname=shop)
+            Coupon.objects.create(writer=cu, shopname=shop, shop_name=shop.shop_name, shop_sector=shop.shop_sector, shop_logo=shop.shop_logo)
             Payment.objects.create(writer=cu, shopname=shop)
             return Response(status=201)
 
@@ -98,7 +98,6 @@ class ProfileViewSet(viewsets.ViewSet):
         serializer2 = ShopProfileUserSerializer(queryset2, many=True)
         
         return Response(serializer.data + serializer2.data)
-
 
 
 
@@ -169,6 +168,7 @@ class ChangeProfileView(generics.UpdateAPIView):
         # 장고의 in은 튜플, 리스트, 쿼리셋 등 반복 가능한 객체를 조회한다. SQL문에서의 WHERE IN과 같은 역할을 한다.
         qs = qs.filter(user=user)
         return qs
+
 
 
 # 업주 QNA에 접근하고 업주 유저인지 확인

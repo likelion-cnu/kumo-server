@@ -19,9 +19,12 @@ class BaseModel(models.Model):
 class Coupon(models.Model):
     writer = models.ForeignKey(CustomerUser, on_delete=models.CASCADE, related_name="shop_writer")
     shopname = models.ForeignKey(ShopUser, on_delete=models.CASCADE, related_name="shop_shopname")
+    shop_name = models.CharField(null=True, max_length=10)
+    shop_sector = models.CharField(null=True, max_length=10)
+    shop_logo = models.ImageField(null=True)
     coupon_num = models.IntegerField(default=0 ,blank=True)
     stamp_num = models.IntegerField(default=0, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateField(auto_now_add=True)
 
     # stamp 개수가 10개 이상이면 0개로 만들고, 쿠폰 개수를 1개 추가
     def save(self,*args,**kwargs):
@@ -37,6 +40,7 @@ class Payment(models.Model):
     payment_at = models.DateTimeField(auto_now_add=True)
     writer = models.ForeignKey(CustomerUser, on_delete=models.CASCADE)
     shopname = models.ForeignKey(ShopUser, on_delete=models.CASCADE)
+    shop_name = models.CharField(max_length=10, null=True)
 
 
 # 리뷰 테이블

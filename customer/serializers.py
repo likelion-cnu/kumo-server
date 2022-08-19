@@ -28,7 +28,7 @@ class CouponHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Coupon
         fields = [
-            "writer", "shopname", "created_at", "coupon_num"
+            "writer", "shopname", "shop_name", "shop_logo", "created_at", "coupon_num"
         ]
 
 
@@ -45,7 +45,7 @@ class MyStampSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coupon
         fields = [
-            "writer", "shopname", "coupon_num", "stamp_num"
+            "writer", "shopname", "shop_name", "coupon_num", "stamp_num", "shop_logo", "shop_sector"
         ]
 
 

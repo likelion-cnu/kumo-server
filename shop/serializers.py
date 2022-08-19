@@ -12,6 +12,7 @@ class QRcodeSerializer(serializers.ModelSerializer):
             "writer", "shopname"
         ]
 
+
 # Shop User Serializer
 class ShopUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -62,7 +63,7 @@ class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = [
-            "writer", "shopname"
+            "writer", "shopname", "shop_name"
         ]
 
 
