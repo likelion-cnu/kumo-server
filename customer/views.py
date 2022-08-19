@@ -67,6 +67,7 @@ class ChangeProfileView(generics.UpdateAPIView):
     #permission_classes = [IsCustomer]  
     lookup_field = 'user'
 
+
     def get_queryset(self):
         user = CustomerUser.objects.filter(user=self.request.user.username)
         qs = super().get_queryset()

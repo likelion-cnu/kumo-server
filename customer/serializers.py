@@ -1,3 +1,4 @@
+from dataclasses import field
 from urllib import request
 from rest_framework import serializers
 from shop.models import Coupon, Review, Review_Comment
@@ -39,6 +40,14 @@ class UserProfileEditSerializer(serializers.ModelSerializer):
             "nickname", "phone_num", "profile_img"
         ]
 
+
+class UserQRCheckSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Coupon
+        fields = [
+            'cu_nickname', 'cu_profile_img', 'coupon_num', 'stamp_num'
+        ]
+    
 
 #MYSTAMP
 class MyStampSerializer(serializers.ModelSerializer):
