@@ -28,13 +28,13 @@ class Coupon(models.Model):
     stamp_num = models.IntegerField(default=0, blank=True)
     created_at = models.DateField(auto_now_add=True)
 
-    # #stamp 개수가 10개 이상이면 0개로 만들고, 쿠폰 개수를 1개 추가
-    # def save(self,*args,**kwargs):
-    #     # self.stamp_num += 1
-    #     if self.stamp_num >= 10:
-    #         self.coupon_num += 1
-    #         self.stamp_num -= 10
-    #         super().save(*args,**kwargs)
+    #stamp 개수가 10개 이상이면 0개로 만들고, 쿠폰 개수를 1개 추가
+    def save(self,*args,**kwargs):
+        # self.stamp_num += 1
+        if self.stamp_num >= 10:
+            self.coupon_num += 1
+            self.stamp_num -= 10
+            super().save(*args,**kwargs)
 
 
 # 결제 테이블
