@@ -43,7 +43,7 @@ class RootView(APIView):
 def QRCheck(request, user):
     cu = CustomerUser.objects.get(user=user)
     shop = ShopUser.objects.get(user=request.user.username)
-    coupons = Coupon.objects.get(writer=cu, shopname=shop, shop_name=shop.shop_name, shop_sector=shop.shop_sector, shop_logo=shop.shop_logo, cu_nickname=cu.nickname, cu_profile_img=cu.profile_img)
+    coupons = Coupon.objects.filter(writer=cu, shopname=shop, shop_name=shop.shop_name, shop_sector=shop.shop_sector, shop_logo=shop.shop_logo, cu_nickname=cu.nickname, cu_profile_img=cu.profile_img)
     if request.method == 'GET':
         if coupons:
             serializer = UserQRCheckSerializer(coupons)
